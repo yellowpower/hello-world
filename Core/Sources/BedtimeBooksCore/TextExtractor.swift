@@ -5,8 +5,9 @@ import Foundation
 ///
 /// Foundation-only extractors (plain text, Markdown) live here in Core so they
 /// can be unit-tested anywhere. Extractors that need Apple frameworks or extra
-/// SPM packages (PDFKit for PDF, ZIPFoundation + SwiftSoup for EPUB/DOCX) live
-/// in the app target and conform to this same protocol.
+/// SPM packages (PDFKit for PDF, ZIPFoundation to unzip EPUB/DOCX) live in the
+/// app target and conform to this same protocol; their XML parsing is delegated
+/// back to Core (EPUBParsing/DOCXParsing) so the logic stays testable.
 public protocol TextExtractor: Sendable {
     /// Lowercased file extensions this extractor handles, e.g. `["txt"]`.
     var supportedExtensions: [String] { get }

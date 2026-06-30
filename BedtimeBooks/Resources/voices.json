@@ -15,9 +15,9 @@
       "kind": "neural",
       "localeIdentifier": "en-US",
       "blurb": "Warm, soothing female voice — great for bedtime.",
-      "source": "onDemandResource",
+      "source": "download",
       "speakerID": 0,
-      "resourceReference": "kokoro-en-v1",
+      "resourceReference": "https://REPLACE-WITH-YOUR-HOST/models/kokoro-en-v1.zip",
       "approxSizeMB": 90,
       "license": "Apache-2.0",
       "attribution": "Kokoro-82M v1.0 (hexgrad / onnx-community)"
@@ -28,9 +28,9 @@
       "kind": "neural",
       "localeIdentifier": "en-US",
       "blurb": "Gentle, expressive female voice.",
-      "source": "onDemandResource",
+      "source": "download",
       "speakerID": 1,
-      "resourceReference": "kokoro-en-v1",
+      "resourceReference": "https://REPLACE-WITH-YOUR-HOST/models/kokoro-en-v1.zip",
       "approxSizeMB": 90,
       "license": "Apache-2.0",
       "attribution": "Kokoro-82M v1.0 (hexgrad / onnx-community)"

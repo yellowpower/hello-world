@@ -12,8 +12,9 @@ Licenses** screen surfaces the same information to users, as required.
 | [Kokoro-82M v1.0](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX) | Default neural voice model | Apache-2.0 |
 | [Piper voices](https://github.com/rhasspy/piper) | Optional neural voices | Per-voice MODEL_CARD |
 | [ZIPFoundation](https://github.com/weichsel/ZIPFoundation) | EPUB/DOCX container reading | MIT |
-| [SwiftSoup](https://github.com/scinfu/SwiftSoup) | EPUB/DOCX markup parsing | MIT |
-| [swift-markdown](https://github.com/apple/swift-markdown) | Markdown parsing | Apache-2.0 |
+
+EPUB/DOCX XML and Markdown are parsed with Foundation's built-in `XMLParser`, so
+no HTML/Markdown third-party package is bundled.
 
 ## ⚠️ Open legal item before App Store submission
 

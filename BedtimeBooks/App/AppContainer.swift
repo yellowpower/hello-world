@@ -13,6 +13,7 @@ final class AppContainer {
     let conversion: ConversionService
     let player: AudioPlayerService
     let catalog: VoiceCatalog
+    let modelDownloader: ModelDownloader
 
     /// Currently selected voice id (persisted in UserDefaults).
     var selectedVoiceID: String {
@@ -35,27 +36,34 @@ final class AppContainer {
         let saved = UserDefaults.standard.string(forKey: Self.voiceKey)
         self.selectedVoiceID = saved ?? catalog.defaultVoiceID
 
-        // The engine factory picks the right TTS engine for a book's voice.
+        let downloader = ModelDownloader(storage: storage)
+        self.modelDownloader = downloader
+
+        // The engine factory picks the right TTS engine for a book's voice:
+        // the neural engine when it's compiled in AND the model is installed,
+        // otherwise Apple's system voice.
         let catalog = self.catalog
         self.conversion = ConversionService(
             storage: storage,
             extractors: extractors,
             makeEngine: { book in
-                AppContainer.makeEngine(voiceID: book.voiceID, catalog: catalog)
+                AppContainer.makeEngine(voiceID: book.voiceID, catalog: catalog, downloader: downloader)
             })
     }
 
-    /// Resolves a `VoiceDescriptor` to a concrete `TTSEngine`. M1 always returns
-    /// the system engine; M2 returns a `NeuralTTSEngine` for `.neural` voices.
-    static func makeEngine(voiceID: String, catalog: VoiceCatalog) -> TTSEngine {
+    /// Resolves a voice id to a concrete `TTSEngine`. Uses the neural engine only
+    /// when sherpa-onnx is compiled in and the model is already on disk; falls
+    /// back to the system voice otherwise so conversion never blocks on a
+    /// missing download.
+    @MainActor
+    static func makeEngine(voiceID: String, catalog: VoiceCatalog, downloader: ModelDownloader) -> TTSEngine {
         let voice = catalog.voice(withID: voiceID)
-        switch voice?.kind {
-        case .neural:
-            // M2: return NeuralTTSEngine(...). Until then, fall back gracefully.
-            return SystemTTSEngine(languageCode: voice?.localeIdentifier ?? "en-US")
-        case .system, .none:
-            return SystemTTSEngine(languageCode: voice?.localeIdentifier ?? "en-US")
+        if voice?.kind == .neural, NeuralTTS.isAvailable, downloader.isInstalled(voiceID),
+           let engine = NeuralTTS.makeEngine(modelDirectory: downloader.modelDirectory(for: voiceID),
+                                             speakerID: voice?.speakerID ?? 0) {
+            return engine
         }
+        return SystemTTSEngine(languageCode: voice?.localeIdentifier ?? "en-US")
     }
 
     private static func loadCatalog() -> VoiceCatalog {

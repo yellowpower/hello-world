@@ -51,14 +51,30 @@ they can be unit-tested on any platform without Xcode.
 brew install xcodegen
 xcodegen generate
 
-# 2. (M2 / neural voices) Build the on-device TTS frameworks, then uncomment the
-#    sherpa-onnx dependencies in project.yml and re-run xcodegen generate.
+# 2. (M2 / neural voices) Build the on-device TTS frameworks. This also copies
+#    the Swift wrapper into Vendor/.
 ./Scripts/build_sherpa_xcframework.sh
+#    Then enable the neural engine in project.yml (the script prints the exact
+#    lines to uncomment): the Vendor/SherpaOnnx.swift source, the two framework
+#    dependencies, and SWIFT_ACTIVE_COMPILATION_CONDITIONS: SHERPA_ENABLED.
 
 # 3. Open and run
 open BedtimeBooks.xcodeproj
 #    Set your signing team, then run on a simulator or device.
 ```
+
+### Neural voice model hosting (M2)
+
+The app downloads the Kokoro model on first use. Host a single `.zip` containing
+the sherpa-onnx Kokoro files laid out as:
+
+```
+model.onnx · voices.bin · tokens.txt · espeak-ng-data/
+```
+
+then put its URL in `BedtimeBooks/Resources/voices.json` (the `resourceReference`
+field — currently a `REPLACE-WITH-YOUR-HOST` placeholder). Without the neural
+engine compiled in, the app simply uses Apple's built-in voice.
 
 ### Running the cross-platform tests (no Xcode needed)
 
@@ -70,8 +86,8 @@ swift test
 ## Roadmap
 
 - **M1 ✅** End-to-end pipeline with Apple's built-in voice (import → convert → play).
-- **M2** Swap in sherpa-onnx + Kokoro neural voice; voice download / On-Demand Resources.
-- **M3** EPUB and DOCX extraction with chapter detection.
+- **M2 ✅** sherpa-onnx + Kokoro neural voice behind `SHERPA_ENABLED`, with on-first-use model download. *(Requires the Mac framework build + a hosted model zip to activate.)*
+- **M3 ✅** EPUB and DOCX extraction with chapter detection (Foundation `XMLParser`, unit-tested in Core).
 - **M4** Player polish (artwork, parental gate, richer chapter metadata).
 - **M5** App Store readiness (privacy, Kids Category compliance, TestFlight).
 

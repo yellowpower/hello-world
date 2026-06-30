@@ -69,6 +69,24 @@ struct ConversionView: View {
         fraction = 0
         task?.cancel()
         task = Task {
+            // If this book uses a neural voice that's compiled in but not yet
+            // downloaded, fetch it first (one-time, over the network). If the
+            // download fails, conversion still proceeds with the system voice.
+            if let voice = container.catalog.voice(withID: book.voiceID),
+               voice.kind == .neural, NeuralTTS.isAvailable,
+               !container.modelDownloader.isInstalled(voice.id) {
+                statusText = "Downloading the \(voice.displayName) voice…"
+                do {
+                    try await container.modelDownloader.ensureInstalled(voice) { f in
+                        fraction = f
+                    }
+                } catch {
+                    // Non-fatal: fall back to the built-in voice for this book.
+                }
+                if Task.isCancelled { return }
+                fraction = 0
+            }
+
             for await progress in container.conversion.convert(book: book, modelContext: modelContext) {
                 apply(progress)
             }

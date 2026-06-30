@@ -19,8 +19,6 @@ struct AboutLicensesView: View {
         .init(name: "ONNX Runtime", license: "MIT", detail: "Neural model inference."),
         .init(name: "espeak-ng", license: "GPL-3.0", detail: "Text phonemization (bundled with sherpa-onnx)."),
         .init(name: "ZIPFoundation", license: "MIT", detail: "EPUB/DOCX container reading."),
-        .init(name: "SwiftSoup", license: "MIT", detail: "EPUB/DOCX markup parsing."),
-        .init(name: "swift-markdown", license: "Apache-2.0", detail: "Markdown parsing."),
     ]
 
     var body: some View {

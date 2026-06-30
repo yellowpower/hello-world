@@ -14,11 +14,11 @@ import BedtimeBooksCore
 final class ConversionService {
     private let storage: StorageService
     private let extractors: TextExtractorRegistry
-    private let makeEngine: (Book) -> TTSEngine
+    private let makeEngine: @MainActor (Book) -> TTSEngine
 
     init(storage: StorageService,
          extractors: TextExtractorRegistry,
-         makeEngine: @escaping (Book) -> TTSEngine) {
+         makeEngine: @MainActor @escaping (Book) -> TTSEngine) {
         self.storage = storage
         self.extractors = extractors
         self.makeEngine = makeEngine
