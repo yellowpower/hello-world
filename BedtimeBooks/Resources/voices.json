@@ -1,0 +1,52 @@
+{
+  "defaultVoiceID": "kokoro-af-heart",
+  "voices": [
+    {
+      "id": "system-en",
+      "displayName": "Built-in Voice",
+      "kind": "system",
+      "localeIdentifier": "en-US",
+      "blurb": "Always available, no download. Apple's on-device voice.",
+      "source": "none"
+    },
+    {
+      "id": "kokoro-af-heart",
+      "displayName": "Heart",
+      "kind": "neural",
+      "localeIdentifier": "en-US",
+      "blurb": "Warm, soothing female voice — great for bedtime.",
+      "source": "onDemandResource",
+      "speakerID": 0,
+      "resourceReference": "kokoro-en-v1",
+      "approxSizeMB": 90,
+      "license": "Apache-2.0",
+      "attribution": "Kokoro-82M v1.0 (hexgrad / onnx-community)"
+    },
+    {
+      "id": "kokoro-af-bella",
+      "displayName": "Bella",
+      "kind": "neural",
+      "localeIdentifier": "en-US",
+      "blurb": "Gentle, expressive female voice.",
+      "source": "onDemandResource",
+      "speakerID": 1,
+      "resourceReference": "kokoro-en-v1",
+      "approxSizeMB": 90,
+      "license": "Apache-2.0",
+      "attribution": "Kokoro-82M v1.0 (hexgrad / onnx-community)"
+    },
+    {
+      "id": "piper-en-lessac",
+      "displayName": "Lessac (compact)",
+      "kind": "neural",
+      "localeIdentifier": "en-US",
+      "blurb": "Smaller download, clear male-leaning voice.",
+      "source": "download",
+      "speakerID": 0,
+      "resourceReference": "https://example.com/models/piper/en_US-lessac-medium",
+      "approxSizeMB": 60,
+      "license": "MIT",
+      "attribution": "Piper en_US-lessac-medium (rhasspy) — verify MODEL_CARD before shipping"
+    }
+  ]
+}

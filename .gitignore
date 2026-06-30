@@ -32,6 +32,21 @@ output/
 *.mp3
 *.wav
 
+# Xcode / Swift
+# The .xcodeproj is generated from project.yml via XcodeGen — never commit it.
+*.xcodeproj/
+*.xcworkspace/
+!Package.swift
+DerivedData/
+.build/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+
+# Vendored neural-TTS binaries are large and built locally on a Mac via
+# Scripts/build_sherpa_xcframework.sh. Keep the folder, ignore its contents.
+Vendor/*.xcframework
+
 # IDE
 .vscode/
 .idea/

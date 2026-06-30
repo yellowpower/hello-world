@@ -1,145 +1,83 @@
-# Audiobook Generator
+# Bedtime Books 🌙
 
-Generate high-quality audiobooks from text or text files using the Eleven Labs API.
+A native iOS app that turns ebooks and documents into soothing audiobooks for
+kids to listen to at bedtime — using **on-device, open-source neural
+text-to-speech** (fully offline, private) with a player tuned for falling
+asleep (sleep timer, background playback, lock-screen controls, resume).
+
+> Replaces the original ElevenLabs Python CLI (now archived in [`legacy/`](legacy/)).
+> The cloud/closed-API approach was swapped for a native, offline, open-source one.
 
 ## Features
 
-- Convert text directly to audio
-- Convert text files to audiobooks
-- Support for multiple voice options
-- Easy-to-use command-line interface
-- Python API for programmatic usage
+- **Import** TXT, Markdown, and PDF today; EPUB and Word (`.docx`) wired for the next milestone.
+- **On-device neural TTS** via [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) running [Kokoro-82M](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX) (Apache-2.0). Works offline once the voice is downloaded.
+- **Bedtime player**: sleep timer with gentle fade-out, background + lock-screen playback, playback speed, chapter navigation, and resume-where-you-left-off.
+- **Kid-safe & private**: no accounts, no tracking, no data collection — everything happens on the device.
 
-## Prerequisites
+## Architecture
 
-- Python 3.7 or higher
-- Eleven Labs API key (get one at https://elevenlabs.io)
+SwiftUI + `@Observable` view models + a service layer, with **SwiftData** for the
+library. See [`docs`](#) and the in-repo plan for details. High level:
 
-## Installation
+```
+Core/                     Cross-platform logic (Foundation only) + unit tests — runs with `swift test`
+BedtimeBooks/
+  App/                    Entry point, dependency container, root view
+  Features/               Library · Import · Conversion · Player · Settings (SwiftUI + view models)
+  Services/
+    TTS/                  TextExtractor implementations + TTSEngine
+    Conversion/           Text → segments → synthesized per-chapter .m4a (with progress/cancel)
+    Player/               AVAudioPlayer playback, sleep timer, now-playing, audio session
+    Storage/              Application Support file layout
+  Models/                 SwiftData Book / Chapter
+  Resources/              voices.json, asset catalog
+  Support/                Info.plist (generated), PrivacyInfo.xcprivacy
+Vendor/                   sherpa-onnx / onnxruntime xcframeworks (built on Mac)
+Scripts/                  build_sherpa_xcframework.sh
+```
 
-1. Clone this repository:
+The text-extraction engines (plain text, Markdown), chunking, file-path math,
+and voice-catalog decoding live in the **`BedtimeBooksCore`** Swift package so
+they can be unit-tested on any platform without Xcode.
+
+## Building
+
+> Requires a **Mac with Xcode 15+**. The `.xcodeproj` is generated from
+> `project.yml` and is not committed.
+
 ```bash
-git clone <your-repo-url>
-cd hello-world
+# 1. Generate the Xcode project
+brew install xcodegen
+xcodegen generate
+
+# 2. (M2 / neural voices) Build the on-device TTS frameworks, then uncomment the
+#    sherpa-onnx dependencies in project.yml and re-run xcodegen generate.
+./Scripts/build_sherpa_xcframework.sh
+
+# 3. Open and run
+open BedtimeBooks.xcodeproj
+#    Set your signing team, then run on a simulator or device.
 ```
 
-2. Install dependencies:
+### Running the cross-platform tests (no Xcode needed)
+
 ```bash
-pip install -r requirements.txt
+cd Core
+swift test
 ```
 
-3. Set up your API key:
-```bash
-cp .env.example .env
-```
+## Roadmap
 
-Edit `.env` and add your Eleven Labs API key:
-```
-ELEVENLABS_API_KEY=your_api_key_here
-```
+- **M1 ✅** End-to-end pipeline with Apple's built-in voice (import → convert → play).
+- **M2** Swap in sherpa-onnx + Kokoro neural voice; voice download / On-Demand Resources.
+- **M3** EPUB and DOCX extraction with chapter detection.
+- **M4** Player polish (artwork, parental gate, richer chapter metadata).
+- **M5** App Store readiness (privacy, Kids Category compliance, TestFlight).
 
-## Usage
+## Licensing note
 
-### Command Line Interface
-
-Generate audiobook from text:
-```bash
-python audiobook_generator.py --text "Your text here" --output my_audiobook.mp3
-```
-
-Generate audiobook from a file:
-```bash
-python audiobook_generator.py --file example.txt --output example.mp3
-```
-
-List available voices:
-```bash
-python audiobook_generator.py --list-voices
-```
-
-Use a specific voice:
-```bash
-python audiobook_generator.py --file example.txt --voice <voice-id> --output custom_voice.mp3
-```
-
-### Python API
-
-```python
-from audiobook_generator import AudiobookGenerator
-
-# Initialize generator
-generator = AudiobookGenerator()
-
-# Generate from text
-generator.generate_audiobook(
-    text="Your text content here",
-    output_path="output.mp3"
-)
-
-# Generate from file
-generator.generate_from_file(
-    input_file="book.txt",
-    output_path="audiobook.mp3"
-)
-
-# List available voices
-generator.list_voices()
-```
-
-## Examples
-
-Check out `usage_examples.py` for more detailed examples including:
-- Direct text to audio conversion
-- File to audio conversion
-- Using custom voices
-- Batch processing multiple files
-
-Run the example:
-```bash
-python audiobook_generator.py --file example.txt
-```
-
-## Configuration
-
-You can configure the following options in your `.env` file:
-
-- `ELEVENLABS_API_KEY`: Your Eleven Labs API key (required)
-- `DEFAULT_VOICE_ID`: Default voice ID to use (optional, defaults to Rachel)
-
-## Available Models
-
-- `eleven_monolingual_v1`: English-only model (default)
-- `eleven_multilingual_v1`: Supports multiple languages
-- `eleven_turbo_v2`: Faster generation with good quality
-
-Specify model with `--model` flag:
-```bash
-python audiobook_generator.py --file text.txt --model eleven_turbo_v2
-```
-
-## Output
-
-Generated audiobooks are saved as MP3 files. The output location can be:
-- Specified with `--output` flag
-- Auto-generated based on input filename
-- Placed in `output/` directory for programmatic usage
-
-## Troubleshooting
-
-**API Key Error**: Make sure your `.env` file contains a valid `ELEVENLABS_API_KEY`
-
-**File Not Found**: Ensure the input file path is correct and the file exists
-
-**Voice ID Error**: List available voices with `--list-voices` and use a valid voice ID
-
-## API Rate Limits
-
-Be aware of Eleven Labs API rate limits and quotas for your subscription tier. Check your usage at https://elevenlabs.io/app/usage
-
-## License
-
-MIT
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+Bedtime Books bundles open-source components — see [`LICENSES/`](LICENSES/). One
+open item before App Store submission: **espeak-ng (GPL-3.0)** ships with
+sherpa-onnx as the phonemizer; confirm GPL-as-bundled-data is acceptable for a
+closed-source release, or configure a model path that avoids it.

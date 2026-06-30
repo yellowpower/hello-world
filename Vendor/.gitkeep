@@ -1,0 +1,3 @@
+# Neural-TTS frameworks (sherpa-onnx.xcframework, onnxruntime.xcframework) are
+# built locally on a Mac via Scripts/build_sherpa_xcframework.sh and dropped
+# here. Their contents are git-ignored; this file keeps the folder present.
