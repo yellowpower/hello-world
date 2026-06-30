@@ -44,7 +44,8 @@ they can be unit-tested on any platform without Xcode.
 ## Building
 
 > Requires a **Mac with Xcode 15+**. The `.xcodeproj` is generated from
-> `project.yml` and is not committed.
+> `project.yml` and is not committed. **New here? See [TRYING.md](TRYING.md)** for
+> a 10-minute walkthrough to a working app on the simulator.
 
 ```bash
 # 1. Generate the Xcode project
